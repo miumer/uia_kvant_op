@@ -1,0 +1,39 @@
+---
+title: "Proov"
+author: "Siim"
+date: "5/26/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+sugu <- rbinom(10,1,0.4)
+amet <- rbinom(10,2,0.5)
+palk <- rbinom(10,1,0.5)
+
+dat <- as.data.frame(cbind(sugu, amet, palk))
+
+dat <- dat %>% 
+  mutate(sugu = factor(sugu, levels = c(0,1), labels = c("M", "N"))) %>% 
+  mutate(amet = factor(amet, levels = c(0,1,2), labels = c("koristaja", "boss", "ametnik"))) %>% 
+  mutate(palk = factor(palk, levels = c(0,1), labels = c("alamakstud", "ülemakstud"))) 
+
+dat %>% 
+  group_by(amet) %>% 
+  count(palk)
+```
+
+1) Intercept annab meile mõlema soo log-oddside (ülemakstud/alamakstud) keskmise
+2) sugu1 annab meile naiste log-oddside(ülemakstud/alamakstud) erinevuse mõlema soo keskmisest
+3) Kui meil on rohkem kui kaks kategooriat, siis saab viimase kategooria effekti, kui liidame teiste tasemete effektid kokku ja lahutame interceptist.
+```{r}
+mudel <- glm(palk ~ amet, data = dat, family = binomial, contrasts = list(amet = "contr.sum"))
+summary(mudel)
+```
